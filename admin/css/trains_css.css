@@ -1,0 +1,11 @@
+.trains_input:disabled{
+    background: transparent;
+    border: none;
+    max-width: 100px;
+}
+
+.trains_input{
+    background: transparent;
+    border: none;
+    width: 100px;
+}
