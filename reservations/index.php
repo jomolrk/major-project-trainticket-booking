@@ -12,6 +12,7 @@
 					<col width="20%">
 					<col width="20%">
 					<col width="15%">
+          <col width="15%">
 					<col width="10%">
 				</colgroup>
 				<thead>
@@ -21,6 +22,7 @@
 						<th>Schedule Code</th>
 						<th>Passenger</th>
 						<th>Group</th>
+            <th>Payment status</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -47,6 +49,30 @@
 									}
 								?>
 							</td>
+              <!--<td class="text-center">
+              
+                <select name="status" id="status" class="form-control form-control-sm form-control-border" required>
+                  <option value="0" <?= isset($status) && $status == 0 ? "selected" : "" ?>>Pending</option>
+                    <option value="1" <?= isset($status) && $status == 1 ? "selected" : "" ?>>Confirmed</option>
+                    <option value="2" <?= isset($status) && $status == 2 ? "selected" : "" ?>>Cancelled</option>
+                    
+                </select>
+                </td>-->
+                <td class="text-center">
+                  <?php
+                if($row['payment_id']!==Null)
+									{
+										echo "Transaction id:".$row['payment_id'];
+								}
+                
+											if( $row['status']=="Active")
+											{
+                                            echo "<br><br><br><a href='payment.php?id=". $row['id'] ."&amount=".$row['fare_amount']."&fname=".$row['firstname']."' title='PayNow' data-toggle='tooltip'><b>PayNow</b></a>";
+											}
+                                        echo "</td>";
+                ?>
+                </td>
+
 							<td align="center">
 								 <button type="button" class="btn btn-flat btn-default btn-sm dropdown-toggle dropdown-icon" data-toggle="dropdown">
 				                  		Action
