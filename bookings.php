@@ -1,17 +1,18 @@
 <?php
  //session_start();
- $n=$_SESSION['email'];
 require_once "config2.php";
-$reg_id=reg_user("login.php");
+$reg_id=reg_user("login.php"); 
+ $n=$_SESSION['email'];
+
 
  ?>
- <head>
- <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<head>
+ 
+
  
  <body>
     <section class="pt-5">
-        <div class="container-fluid" style="background-color: white;">
+        <div class="container-fluid" style="background-color: white";>
             <div class="row">
                 <div class="col-md-12">
                     <div class="page-header clearfix">
@@ -27,9 +28,7 @@ $reg_id=reg_user("login.php");
                           <input type="text" class="form-control" placeholder="Search this table" name="search">
                         </div>
                     </div>
-                    <input type="hidden" id="name1" value="<?php echo $n; ?>">
                         </form>
-
                     <br>
 
                     <?php
@@ -53,7 +52,7 @@ $reg_id=reg_user("login.php");
                         $pageno = 1;
                     }
 
-                 
+                    //$no_of_records_per_page is set on the index page. Default is 10.
                     $offset = ($pageno-1) * $no_of_records_per_page;
 
                     $total_pages_sql = "SELECT COUNT(*) FROM ticketbook";
@@ -122,7 +121,6 @@ $reg_id=reg_user("login.php");
 										echo "<th><a href=?search=$search&sort=&order=seat_type&sort=$sort>Type</th>";
 										echo "<th><a href=?search=$search&sort=&order=fare_amount&sort=$sort>Fare</th>";
 										echo "<th><a href=?search=$search&sort=&order=date_created&sort=$sort>Booked date</th>";
-                             
 										//echo "<th><a href=?search=$search&sort=&order=date_updated&sort=$sort>Updated date</th>";
 										echo "<th><a href=?search=$search&sort=&order=status&sort=$sort>Status</th>";
 										
@@ -168,20 +166,27 @@ else
 									
 									echo "<td>" . $row['fare_amount'] . "</td>";echo "<td>" . $row['date_created'] . "</td>";
                                     //echo "<td>" . $row['date_updated'] . "</td>";
-									echo "<td>" . $row['status'] . "</td>";
+									echo "<td>" . $row['status'] . " ";
+									if($row['payment_id']!==Null)
+									{
+										echo "<br><br><br> Transaction id:".$row['payment_id'];
+								}
+									echo "</td>";
 									
                                         echo "<td>";
 										
                                             //echo "<a href='ticketbook-read.php?id=". $row['id'] ."' title='View Record' data-toggle='tooltip'><i class='far fa-eye'></i></a>";
                                             echo "<a href='ticketbook-update.php?id=". $row['id'] ."&status=cancel' title='Update Record' data-toggle='tooltip'>Cancel Ticket<i class='far fa-edit'></i></a>";
-                                            //echo "<a href='ticketbook-delete.php?id=". $row['id'] ."' title='Delete Record' data-toggle='tooltip'><i class='far fa-trash-alt'></i></a>";
-                                            // echo "<a href='payment.php?id=". $row['id'] ."'title='payment Record' data-toggle='tooltip'>payment<i class='far fa-edit'></i></a>";
-                                          ?>  <input type="button" id="rzp-button1"name="btn"value="pay now"class="btn btn-primary" onclick="pay_now()"/>
-                                          <?php  echo "</tr>";
+											
+											if( $row['status']=="Active")
+											{
+                                            echo "<br><br><br><a href='payment.php?id=". $row['id'] ."&amount=".$row['fare_amount']."&fname=".$row['firstname']."' title='PayNow' data-toggle='tooltip'><b>PayNow</b></a>";
+											}
+                                        echo "</td>";
+                                    echo "</tr>";
                                 }
                                 echo "</tbody>";
                             echo "</table>";
-                           // $a=$row['fare_amount'];
 ?>
                                 <ul class="pagination" align-right>
                                 <?php
@@ -226,42 +231,6 @@ else
             $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
-    <script>
-         function pay_now(){
-		var name = jQuery('#name1').val();
-        
-		console.log(name);
-		
-        var amount=<?php echo $row['fare_amount'] ?>;
-        
-        var options =  {
-            "key": "rzp_test_D5Na98iqxqTQLf", // Enter the Key ID generated from the Dashboard
-            "amount": amount*100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-            "currency": "INR",
-            "name": "Travel Valley",
-            "description": "Test Transaction",
-            "image": "https://example.com/your_logo",
-            "handler":function(response){
-              
-               jQuery.ajax({
-                   type:"POST",
-                   url: "payment_process.php",
-                   data:"payment_id="+response.razorpay_payment_id+"&amount="+amount+"&name="+name,
-                   success:function(result){
-                       window,location.href="thankyou.php";
-                   }
-               });
-              
-      }
-        
-    
-};
-var rzp1 = new Razorpay(options);
-
-    rzp1.open();
-    
-    }
-        </script>
 
 
 </html>
