@@ -10,8 +10,9 @@
 					<col width="15%">
 					<col width="20%">
 					<col width="20%">
-					<col width="20%">
 					<col width="15%">
+          <col width="15%">
+					<col width="20%">
           <col width="15%">
 					<col width="10%">
 				</colgroup>
@@ -20,6 +21,7 @@
 						<th>Seat #</th>
 						<th>Schedule</th>
 						<th>Schedule Code</th>
+            <th>Train name</th>
 						<th>Passenger</th>
 						<th>Group</th>
             <th>Payment status</th>
@@ -29,14 +31,15 @@
 				<tbody>
 					<?php 
 						$i = 1;
-						$qry = $conn->query("SELECT r.*,s.code as sched_code from `ticketbook` r inner join `schedule_list` s on r.schedule_id = s.id order by unix_timestamp(r.`date_created`) desc ");
+						$qry = $conn->query("SELECT r.*,s.code as sched_code,train.name as train_name from `ticketbook` r inner join `schedule_list` s on r.schedule_id = s.id  inner join train on s.train_id=train.id order by unix_timestamp(r.`date_created`) desc ");
 						while($row = $qry->fetch_assoc()):
 					?>
 						<tr>
 							<td><?= $row['seat_num'] ?></td>
 							<td class=""><?php echo date("Y-m-d H:i",strtotime($row['schedule'])) ?></td>
 							<td><?php echo ($row['sched_code']) ?></td>
-							<td class=""><p class="truncate-1"><?php echo ucwords($row['lastname'].', '.$row['firstname'].' '.$row['middlename']) ?></p></td>
+              <td><?php echo ($row['train_name']) ?></td>
+							<td class=""><p class="truncate-1"><?php echo ucwords($row['firstname'].' '.$row['middlename'].' '.$row['lastname']) ?></p></td>
 							<td class="text-center">
 								<?php 
 									switch ($row['seat_type']){
@@ -64,10 +67,22 @@
 									{
 										echo "Transaction id:".$row['payment_id'];
 								}
+								if($row['payment_id']!=""&&$row['refund_id']=="")
+								{
+									echo "<br><br><br><a href='refund.php?id=". $row['id'] ."&amount=".$row['fare_amount']."'>Refund Now</a>";
+									
+								}
+								
+								if($row['refund_id']!="")
+								{
+									echo "<br><br><br><font color='violet'>Amount Refunded! <br>Referece:".$row['refund_id']."</font>";
+									
+								}
+							
                 
 											if( $row['status']=="Active")
 											{
-                                            echo "<br><br><br><a href='payment.php?id=". $row['id'] ."&amount=".$row['fare_amount']."&fname=".$row['firstname']."' title='PayNow' data-toggle='tooltip'><b>PayNow</b></a>";
+                        echo "<br><br><br><font color='blue'>Waiting for payment".$row['payment_id']."</font>";
 											}
                                         echo "</td>";
                 ?>
