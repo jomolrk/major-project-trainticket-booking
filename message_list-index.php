@@ -144,7 +144,7 @@
 										echo "<th><a href=?search=$search&sort=&order=contact&sort=$sort>Contact</th>";
 										echo "<th><a href=?search=$search&sort=&order=email&sort=$sort>Email</th>";
 										echo "<th><a href=?search=$search&sort=&order=message&sort=$sort>Cust. Message</th>";
-									//	echo "<th><a href=?search=$search&sort=&order=reply&sort=$sort>Reply</th>";
+										echo "<th><a href=?search=$search&sort=&order=reply&sort=$sort>Reply</th>";
 										echo "<th><a href=?search=$search&sort=&order=date_created&sort=$sort>Date</th>";
 										
                                         echo "<th>Action</th>";
