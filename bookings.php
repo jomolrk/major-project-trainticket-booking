@@ -22,13 +22,16 @@ $reg_id=reg_user("login.php");
                         <a href="index.php" class="btn btn-secondary float-right mr-2">Back</a>-->
                     </div>
 
-                    <div class="form-row">
-                        <form action="ticketbook-index.php" method="get">
-                        <div class="col">
-                          <input type="text" class="form-control" placeholder="Search this table" name="search">
-                        </div>
-                    </div>
-                        </form>
+                   <form action="./" method="get">
+  <div class="form-row">
+    <div class="col">
+      <input type="text" class="form-control" placeholder="Search Seat number, Booked date, Status...." name="search">
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+    <input type="hidden" name="page" value="bookings">
+  </div>
+</form>
+
                     <br>
 
                     <?php
@@ -123,8 +126,8 @@ $reg_id=reg_user("login.php");
 										echo "<th><a href=?search=$search&sort=&order=date_created&sort=$sort>Booked date</th>";
 										//echo "<th><a href=?search=$search&sort=&order=date_updated&sort=$sort>Updated date</th>";
 										echo "<th><a href=?search=$search&sort=&order=status&sort=$sort>Status</th>";
-										
-                                        echo "<th>Action</th>";
+										//echo "<th><a href=?search=$search&sort=&order=tickets&sort=$sort>Tickets</th>";
+                                        echo "<th><a href=?search=$search&sort=&order=action&sort=$sort>Action</th>";
                                     echo "</tr>";
                                 echo "</thead>";
                                 echo "<tbody>";
@@ -167,20 +170,36 @@ else
 									echo "<td>" . $row['fare_amount'] . "</td>";echo "<td>" . $row['date_created'] . "</td>";
                                     //echo "<td>" . $row['date_updated'] . "</td>";
 									echo "<td>" . $row['status'] . " ";
-									if($row['payment_id']!==Null)
+									if($row['payment_id']!==Null && $row['status'] === 'Paid')
 									{
 										echo "<br><br><br> Transaction id:".$row['payment_id'];
 								}
+                                else if( $row['status'] === 'Cancelled')
+                                {
+                                    echo "<br><font color='blue'>Booking is Cancelled</font>"; 
+                                }
+                                else if( $row['status'] === 'Refunded')
+                                {
+                                    echo "<br><font color='blue'>Amount Refunded</font>";
+
+                                }
+                                else {
+                                    echo "<br><font color='red'>Payment has not been received.Booking is pending</font>";
+                                }
 									echo "</td>";
+                                   // echo "<td>";
+                                    //echo "<a href='?page=tickets&ids=". $row['id'] ."' title='Print Page' data-toggle='tooltip'>Print ticket</a><br>";
+                                   //  echo "</td>";
 									
                                         echo "<td>";
 										
-                                            //echo "<a href='ticketbook-read.php?id=". $row['id'] ."' title='View Record' data-toggle='tooltip'><i class='far fa-eye'></i></a>";
+                                          //  echo "<a href='ticketbook-read.php?id=". $row['id'] ."' title='View Record' data-toggle='tooltip'><i class='far fa-eye'></i></a>";
+                                          echo "<a href='?page=tickets&ids=". $row['id'] ."' title='Print Page'  data-toggle='tooltip'>Download/Print ticket<span class='fa fa-download'></span></a><br><br>";
                                             echo "<a href='ticketbook-update.php?id=". $row['id'] ."&status=cancel' title='Update Record' data-toggle='tooltip'>Cancel Ticket<i class='far fa-edit'></i></a>";
 											
 											if( $row['status']=="Active")
 											{
-                                            echo "<br><br><br><a href='payment.php?id=". $row['id'] ."&amount=".$row['fare_amount']."&fname=".$row['firstname']."' title='PayNow' data-toggle='tooltip'><b>PayNow</b></a>";
+                                            echo "<br><br><a href='payment.php?id=". $row['id'] ."&amount=".$row['fare_amount']."&fname=".$row['firstname']."' title='PayNow' data-toggle='tooltip'><b>PayNow <span class='fa fa-credit-card' style='font-size: 14px; color: green;'></span></b></a>";
 											}
                                         echo "</td>";
                                     echo "</tr>";
