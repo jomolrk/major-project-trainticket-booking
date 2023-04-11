@@ -2,7 +2,7 @@
 // Process delete operation after confirmation
 if(isset($_POST["id"]) && !empty($_POST["id"])){
     // Include config file
-    require_once "config.php";
+    require_once "config2.php";
     
 
     // Prepare a delete statement
@@ -22,7 +22,7 @@ if(isset($_POST["id"]) && !empty($_POST["id"])){
         // Attempt to execute the prepared statement
         if(mysqli_stmt_execute($stmt)){
             // Records deleted successfully. Redirect to landing page
-            header("location: message_list-index.php");
+            header("location: ./?page=message_list-index");
             exit();
         } else{
             echo "Oops! Something went wrong. Please try again later.<br>".$stmt->error;

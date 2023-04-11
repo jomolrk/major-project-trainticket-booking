@@ -17,35 +17,25 @@
         }
     </style>
 	
- <?php require_once('../config.php'); ?>
-  <!DOCTYPE html>
- <html lang="en" class="" style="height: auto;">
- <?php require_once('inc/header.php') ?>
+  <?php
+  //session_start();
+ require_once "config2.php";
+ $reg_id=reg_user("login.php");
+ $fullname=prav_get("first_name","tbl_register","reg_id",$reg_id);
+ 
+  ?>
  
 </head>
 <body>
 
-   <body class="sidebar-mini layout-fixed control-sidebar-slide-open layout-navbar-fixed sidebar-mini-md sidebar-mini-xs" data-new-gr-c-s-check-loaded="14.991.0" data-gr-ext-installed="" style="height: auto;">
-     <div class="wrapper">
-      <?php require_once('inc/topBarNav.php') ?>
-      <?php require_once('inc/navigation.php') ?>
-      <?php if($_settings->chk_flashdata('success')): ?>
-       <script>
-         alert_toast("<?php echo $_settings->flashdata('success') ?>",'success')
-       </script>
-       <?php endif;?>    
-      <?php $page = isset($_GET['page']) ? $_GET['page'] : 'home';  ?>
-       <!-- Content Wrapper. Contains page content -->
-       <div class="content-wrapper pt-3" style="min-height: 567.854px;">
-      
-       
+ 
     <section class="pt-5">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <div class="page-header clearfix">
                         <h2 class="float-left">Message Details</h2>
-                        <!--<a href="message_list-create.php" class="btn btn-success float-right">Add New Record</a>-->
+                        
                        <!-- <a href="message_list-index.php" class="btn btn-info float-right mr-2">Reset View</a>
                         <a href="index.php" class="btn btn-secondary float-right mr-2">Back</a>-->
                     </div>
@@ -54,7 +44,6 @@
                         <form action="message_list-index.php" method="get">
                         <div class="col">
                           <input type="text" class="form-control" placeholder="Search this table" name="search">
-                          <button type="submit" class="btn btn-primary">Search</button>
                         </div>
                     </div>
                         </form>
@@ -84,13 +73,13 @@
                     //$no_of_records_per_page is set on the index page. Default is 10.
                     $offset = ($pageno-1) * $no_of_records_per_page;
 
-                    $total_pages_sql = "SELECT COUNT(*) FROM message_list";
+                    $total_pages_sql = "SELECT COUNT(*) FROM message_list where fullname='".$fullname."'";
                     $result = mysqli_query($link,$total_pages_sql);
                     $total_rows = mysqli_fetch_array($result)[0];
                     $total_pages = ceil($total_rows / $no_of_records_per_page);
 
                     //Column sorting on column name
-                    $orderBy = array('id', 'fullname', 'contact', 'email', 'message', 'reply', 'date_created');
+                    $orderBy = array('id', 'fullname', 'contact', 'email', 'message', 'status', 'reply', 'date_created');
                     $order = 'id';
                     if (isset($_GET['order']) && in_array($_GET['order'], $orderBy)) {
                             $order = $_GET['order'];
@@ -108,19 +97,20 @@
                     }
 
                     // Attempt select query execution
-                    $sql = "SELECT * FROM message_list ORDER BY $order $sort LIMIT $offset, $no_of_records_per_page";
-                    $count_pages = "SELECT * FROM message_list";
+                    $sql = "SELECT * FROM message_list where fullname='".$fullname."' ORDER BY $order $sort LIMIT $offset, $no_of_records_per_page";
+					
+                    $count_pages = "SELECT * FROM message_list where fullname='".$fullname."'";
 
 
                     if(!empty($_GET['search'])) {
                         $search = ($_GET['search']);
                         $sql = "SELECT * FROM message_list
-                            WHERE CONCAT_WS (id,fullname,contact,email,message,reply,date_created)
+                            WHERE CONCAT_WS (id,fullname,contact,email,message,status,reply,date_created)
                             LIKE '%$search%'
                             ORDER BY $order $sort
                             LIMIT $offset, $no_of_records_per_page";
                         $count_pages = "SELECT * FROM message_list
-                            WHERE CONCAT_WS (id,fullname,contact,email,message,reply,date_created)
+                            WHERE CONCAT_WS (id,fullname,contact,email,message,status,reply,date_created)
                             LIKE '%$search%'
                             ORDER BY $order $sort";
                     }
@@ -143,7 +133,8 @@
 										echo "<th><a href=?search=$search&sort=&order=fullname&sort=$sort>Fullname</th>";
 										echo "<th><a href=?search=$search&sort=&order=contact&sort=$sort>Contact</th>";
 										echo "<th><a href=?search=$search&sort=&order=email&sort=$sort>Email</th>";
-										echo "<th><a href=?search=$search&sort=&order=message&sort=$sort>Cust. Message</th>";
+										echo "<th><a href=?search=$search&sort=&order=message&sort=$sort>Message</th>";
+										//echo "<th><a href=?search=$search&sort=&order=status&sort=$sort>Status</th>";
 										echo "<th><a href=?search=$search&sort=&order=reply&sort=$sort>Reply</th>";
 										echo "<th><a href=?search=$search&sort=&order=date_created&sort=$sort>Date</th>";
 										
@@ -154,6 +145,8 @@
                                 while($row = mysqli_fetch_array($result)){
                                     echo "<tr>";
                                     echo "<td>" . $row['id'] . "</td>";echo "<td>" . $row['fullname'] . "</td>";echo "<td>" . $row['contact'] . "</td>";echo "<td>" . $row['email'] . "</td>";echo "<td>" . $row['message'] . "</td>";
+									//echo "<td>" . $row['status'] . "</td>";
+									
 									if($row['status']!=0)
 									{
 									echo "<td>" . $row['reply'] . "</td>";
@@ -161,17 +154,15 @@
 									else
 									{
 										
-										echo "<td><font color='red'>Not replied </font></td>";
+										echo "<td><font color='red'>Waiting for reply</font></td>";
 									}
-									
-									
 									
 									
 									echo "<td>" . $row['date_created'] . "</td>";
                                         echo "<td>";
-										//Praveen thappily test
+										
                                             //echo "<a href='message_list-read.php?id=". $row['id'] ."' title='View Record' data-toggle='tooltip'><i class='far fa-eye'></i></a>";
-                                            echo "<a href='message_list-update.php?id=". $row['id'] ."' title='Reply' data-toggle='tooltip'>Give/Modify Reply</a>";
+                                           // echo "<a href='message_list-update.php?id=". $row['id'] ."' title='Update Record' data-toggle='tooltip'><i class='far fa-edit'></i></a>";
                                             echo "<a href='message_list-delete.php?id=". $row['id'] ."' title='Delete Record' data-toggle='tooltip'><i class='far fa-trash-alt'></i></a>";
                                         echo "</td>";
                                     echo "</tr>";
@@ -213,79 +204,6 @@
     </section>
 		
  
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-         <!-- /.content -->
-   <div class="modal fade" id="confirm_modal" role='dialog'>
-     <div class="modal-dialog modal-md modal-dialog-centered rounded-0" role="document">
-       <div class="modal-content">
-         <div class="modal-header">
-         <h5 class="modal-title">Confirmation</h5>
-       </div>
-       <div class="modal-body">
-         <div id="delete_content"></div>
-       </div>
-       <div class="modal-footer">
-         <button type="button" class="btn btn-primary btn-flat" id='confirm' onclick="">Continue</button>
-         <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Close</button>
-       </div>
-       </div>
-     </div>
-   </div>
-   <div class="modal fade rounded-0" id="uni_modal" role='dialog'>
-     <div class="modal-dialog modal-md modal-dialog-centered rounded-0" role="document">
-       <div class="modal-content rounded-0">
-         <div class="modal-header rounded-0">
-         <h5 class="modal-title"></h5>
-       </div>
-       <div class="modal-body rounded-0">
-       </div>
-       <div class="modal-footer">
-         <button type="button" class="btn btn-primary btn-flat" id='submit' onclick="$('#uni_modal form').submit()">Save</button>
-         <button type="button" class="btn btn-secondary btn-flat" data-dismiss="modal">Cancel</button>
-       </div>
-       </div>
-     </div>
-   </div>
-   <div class="modal fade rounded-0" id="uni_modal_right" role='dialog'>
-     <div class="modal-dialog modal-full-height  modal-md rounded-0" role="document">
-       <div class="modal-content">
-         <div class="modal-header">
-         <h5 class="modal-title"></h5>
-         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-           <span class="fa fa-arrow-right"></span>
-         </button>
-       </div>
-       <div class="modal-body">
-       </div>
-       </div>
-     </div>
-   </div>
-   <div class="modal fade rounded-0" id="viewer_modal" role='dialog'>
-     <div class="modal-dialog modal-md rounded-0" role="document">
-       <div class="modal-content">
-               <button type="button" class="btn-close" data-dismiss="modal"><span class="fa fa-times"></span></button>
-               <img src="" alt="">
-       </div>
-     </div>
-   </div>
-       </div>
-       <!-- /.content-wrapper -->
-       <?php require_once('inc/footer.php') ?>
-   
 <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
