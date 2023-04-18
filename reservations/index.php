@@ -7,12 +7,13 @@
         <div class="container-fluid">
 			<table class="table table-hover table-striped table-bordered">
 				<colgroup>
+					<col width="8%">
 					<col width="15%">
-					<col width="20%">
-					<col width="20%">
+					<col width="15%">
 					<col width="15%">
           <col width="15%">
-					<col width="20%">
+          <col width="20%">
+					<col width="15%">
           <col width="15%">
 					<col width="10%">
 				</colgroup>
@@ -24,6 +25,7 @@
             <th>Train name</th>
 						<th>Passenger</th>
 						<th>Group</th>
+            <th>Fare</th>
             <th>Payment status</th>
 						<th>Action</th>
 					</tr>
@@ -39,6 +41,7 @@
 							<td class=""><?php echo date("Y-m-d H:i",strtotime($row['schedule'])) ?></td>
 							<td><?php echo ($row['sched_code']) ?></td>
               <td><?php echo ($row['train_name']) ?></td>
+         
 							<td class=""><p class="truncate-1"><?php echo ucwords($row['firstname'].' '.$row['middlename'].' '.$row['lastname']) ?></p></td>
 							<td class="text-center">
 								<?php 
@@ -52,6 +55,7 @@
 									}
 								?>
 							</td>
+              <td><?php echo ($row['fare_amount']) ?></td>
               <!--<td class="text-center">
               
                 <select name="status" id="status" class="form-control form-control-sm form-control-border" required>
